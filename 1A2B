@@ -1,0 +1,59 @@
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+
+using namespace std;
+
+int main()
+{
+    cout << "這是一款名為1A2B的遊戲" << endl ;
+    cout << "密碼為0~9之間不重複的四個連續數字" << endl ;
+   int i , p , num ;
+   int password[10] ;
+   int guess[4] , tmp , counterA = 0 , counterB = 0 , j , k  ;
+   int attempts = 0 ;
+
+   for ( i = 0 ; i < 10 ; ++i) password[i] = i;
+
+   srand(time(0)) ;
+   for  ( i = 0 ; i < 4 ; ++i ){
+    p = rand() % 10 ;
+    if ( p == i ) continue ;
+    tmp = password[i] ;
+    password[i] = password[p] ;
+    password[p] = tmp ;
+   }
+
+   while( counterA != 4 ){
+    cout << "請輸入你所猜測的密碼:" ;
+    cin >> num;
+    guess[3] =  num / 1000 ;
+    guess[2] = (num/100) % 10 ;
+    guess[1] = (num/10) %10 ;
+    guess[0] =  num % 10 ;
+
+    counterA = counterB = 0;
+    for( j = 0 ; j < 4 ; ++j ){
+        for( k = 0 ; k < 4 ; ++k ){
+            if( password[j] == guess[k] ){
+                if( j == k ){
+                    counterA++;
+                } else {
+                    counterB++;
+                }
+            }
+        }
+    }
+
+    attempts++ ;
+
+    if( counterA == 4 ){
+       cout << "恭喜你回答正確" << "你總共猜測" << attempts+1 << "次" << endl;
+       break;
+    } else {
+       cout << counterA << "A" << counterB << "B" << endl;
+    }
+
+   }
+   return 0 ;
+}
