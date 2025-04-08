@@ -1,0 +1,279 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <chrono>
+#include <thread> // 用於 this_thread::sleep_for
+#include <set>  // 用於存放不重複的開獎號碼
+
+
+using namespace std;
+
+int money , startmoney ;
+bool running = true; // 控制遊戲是否繼續
+
+// 清除畫面函式（Windows / Linux 相容）
+void clearScreen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
+// 顯示彩券行主選單
+void showMenu() {
+    clearScreen();
+    cout << "+----------------------+" << endl;
+    cout << "|   金財源滾滾彩券行   |" << endl;
+    cout << "+----------------------+" << endl;
+    cout << "| 1. 買大樂透（$50）   |" << endl;
+    cout << "| 2. 買刮刮樂          |" << endl;
+    cout << "| 3. 查詢餘額          |" << endl;
+    cout << "| 4. 離開遊戲          |" << endl;
+    cout << "+----------------------+" << endl;
+    cout << "請選擇操作（輸入 1-4）: ";
+}
+
+//大樂透
+void playLotto(){
+    if(money < 50){
+        cout << "餘額不足，無法購買大樂透" << endl;
+        return;
+    }
+    money -= 50;
+
+    //購買彩票
+    int playernumber[6];
+    cout << "你購買了大樂透，請輸入六個號碼並用空格隔開: ";
+    for (int i = 0; i < 6; ++i){
+            cin >> playernumber[i];
+    }
+    // 產生不重複的中獎號碼
+    srand(time(0));
+    set<int> luckySet;
+    while (luckySet.size() < 6) {
+        luckySet.insert(rand() % 49 + 1);
+    }
+
+    // 產生特別號
+    int specialNumber;
+    do {
+        specialNumber = rand() % 49 + 1;
+    } while (luckySet.count(specialNumber));  // 確保特別號不與普通號碼重複
+
+    // 將 set 轉為陣列以便處理
+    int luckyNumbers[6], idx = 0;
+    for (int num : luckySet) {
+        luckyNumbers[idx++] = num;
+    }
+
+    // 顯示開獎過程
+    for (int i = 0; i < 6; ++i) {
+        cout << "開獎號碼：" << luckyNumbers[i] << endl;
+        cout.flush();
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    cout << "特別號：" << specialNumber << endl;
+    cout.flush();
+    this_thread::sleep_for(chrono::seconds(1));
+
+    // 檢查中獎情況
+    int normal = 0, special = 0;
+    for (int i = 0; i < 6; ++i) {
+        for (int j = 0; j < 6; ++j) {
+            if (playernumber[i] == luckyNumbers[j]) {
+                normal++;
+            }
+        }
+        if (playernumber[i] == specialNumber) {
+            special++;
+        }
+    }
+
+    cout << "你中了 " << normal << " 個號碼，特別號 " << special << " 個" << endl;
+
+    // 計算獎金
+    int matchnumber = normal + special * 7;
+    switch (matchnumber) {
+        case 6:
+            money += 300000000;
+            cout << "恭喜中獎！你獲得三億元！" << endl;
+            break;
+        case 5:
+            money += 80000;
+            cout << "恭喜中獎！你獲得八萬元！" << endl;
+            break;
+        case 4:
+            money += 2000;
+            cout << "恭喜中獎！你獲得兩千元！" << endl;
+            break;
+        case 3:
+            money += 400;
+            cout << "恭喜中獎！你獲得四百元！" << endl;
+            break;
+        case 12:
+            money += 3000000;
+            cout << "恭喜中獎！你獲得三百萬元！" << endl;
+            break;
+        case 11:
+            money += 20000;
+            cout << "恭喜中獎！你獲得兩萬元！" << endl;
+            break;
+        case 10:
+            money += 1000;
+            cout << "恭喜中獎！你獲得一千元！" << endl;
+            break;
+        case 9:
+            money += 400;
+            cout << "恭喜中獎！你獲得四百元！" << endl;
+            break;
+        default:
+            cout << "很可惜你這次沒有中獎" << endl;
+    }
+}
+
+//刮刮樂
+void playscratch(){
+    int scratchtype;
+    cout << "請選擇你要的刮刮樂款式" << endl;
+    cout << "一百元請輸入 1 " << endl;
+    cout << "一千元請輸入 2 " << endl;
+    cout << "一萬元請輸入 3 " << endl;
+    cout << "十萬元請輸入 4 " << endl;
+    cout << "一百萬元請輸入 5 " << endl;
+    cin >> scratchtype;
+
+    int cost, reward, chance1, chance2;
+    switch (scratchtype) {
+        case 1:
+            cost = 100;
+            reward = 300;
+            chance1 = 40;
+            chance2 = 80;
+            break;
+        case 2:
+            cost = 1000;
+            reward = 3000;
+            chance1 = 40;
+            chance2 = 80;
+            break;
+        case 3:
+            cost = 10000;
+            reward = 30000;
+            chance1 = 40;
+            chance2 = 80;
+            break;
+        case 4:
+            cost = 100000;
+            reward = 300000;
+            chance1 = 40;
+            chance2 = 80;
+            break;
+        case 5:
+            cost = 1000000;
+            reward = 3000000;
+            chance1 = 40;
+            chance2 = 80;
+            break;
+        default:
+            cout << "輸入無效，請重新輸入" << endl;
+            return;
+    }
+
+    if(money < cost){
+        cout << "餘額不足，無法購買" << endl;
+        return;
+    }
+
+     money -= cost;
+     srand(time(0));
+     int randomnum = rand() % 100;
+
+    cout << "刮開中";
+    cout.flush(); // 立即輸出，避免延遲
+
+    // 模擬「刮刮樂刮開中」的動畫
+    for (int i = 0; i < 3; ++i) {
+        this_thread::sleep_for(chrono::milliseconds(400)); // 等待 400 毫秒
+        cout << ".";
+        cout.flush();
+    }
+
+    // 停頓 1 秒，營造緊張感
+    this_thread::sleep_for(chrono::seconds(1));
+
+    cout << endl; // 換行，避免動畫影響下一行輸出
+
+    if (randomnum < chance1) {
+        cout << "很可惜沒中獎" << endl;
+    } else if (randomnum < chance2) {
+        cout << "恭喜中獎！獲得" << cost << "元" << endl;
+        money += cost;
+    }else {
+        cout << "恭喜中獎！獲得" << reward << "元" << endl;
+        money += reward;
+    }
+}
+
+//查詢餘額
+void checkBalance() {
+    cout << "你目前的餘額為: " << money << "元" << endl;
+}
+
+int main() {
+    srand(time(0)); // 設定隨機種子，確保每次運行的結果不同
+
+    // 產生隨機初始金額
+    int startmoney = rand() % 9;
+
+    if (startmoney < 1) {
+        cout << "氣運驚人！你得到十萬元啟動資金！" << endl;
+        money = 100000;
+    } else if (startmoney < 4) {
+        cout << "你的運氣不錯，獲得一萬元啟動資金！" << endl;
+        money = 10000;
+    } else {
+        cout << "超衰，只有一千元，哈哈！" << endl;
+        money = 1000;
+    }
+
+    // 先讓玩家按enter確認再進入主選單
+    cout << "按 Enter 繼續";
+    cin.ignore();
+    cin.get();
+
+    // 進入主選單
+    while (running) {
+        showMenu();
+        int choice;
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                playLotto();
+                break;
+            case 2:
+                playscratch();
+                break;
+            case 3:
+                checkBalance();
+                break;
+            case 4:
+                running = false;
+                cout << "祝你中獎，歡迎再度光臨！" << endl;
+                break;
+            default:
+                cout << "無效輸入，請重新選擇" << endl;
+        }
+
+        cout << "按 Enter 繼續";
+        cin.ignore();
+        cin.get();
+        if(money < 50){
+            cout << "賭到沒錢了吧哈哈" << " 你只剩" << money << "元" << " 請你離開這裡" << endl;
+            exit(0);
+        }
+    }
+    return 0;
+}
