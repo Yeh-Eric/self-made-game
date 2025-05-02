@@ -1,6 +1,6 @@
 # self-made-game  
 
-C++ gmae  
+C++ game
 
 you can copy the code and paste in C++ ide  
 
